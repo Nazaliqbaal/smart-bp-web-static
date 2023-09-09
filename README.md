@@ -7,7 +7,7 @@ Visit the application at [SmartBp Tracker](https://smartbp-checkbloodpressure.ne
 
 Select the guideline of your choice:
 
-2017 ACC/AHA Guidelines
+2017 ACC/AHA Guidelines or
 2018 ESC/ESH Guidelines
 
 Enter your diastolic (dia) and systolic (sys) blood pressure values in the provided input fields.
