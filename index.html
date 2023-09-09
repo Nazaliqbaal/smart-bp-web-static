@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartBP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    .container-body {
+      max-width: 768px;
+      margin: 0 auto;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      background-color: #dae5ee;
+      height: 60px;
+      border-radius: 8px;
+      color: #989fa5;
+      padding: 5px;
+      margin-bottom: 20px;
+    }
+    .year-choice {
+      border: none;
+      border-radius: 8px;
+      height: 50px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .year-choice.active {
+      background-color: #fefefe;
+      color: #28b2c7;
+      box-shadow: rgb(205 201 201) 2px 2px 5px;
+    }
+    .year-choice {
+      background-color: #dae5ee;
+      color: #989fa5;
+    }
+    .reading-container {
+      padding: 15px 5px;
+      margin-bottom: 50px;
+      border-radius: 16px;
+      box-shadow: 2px 2px 5px rgb(240 239 239);
+    }
+    .readings {
+      display: flex;
+      justify-content: space-between;
+    }
+    .reading1 {
+      margin-bottom: 15px;
+    }
+    .unit {
+      font-size: 24px;
+      font-weight: bold;
+      color: #393b42;
+    }
+    .unit-value {
+      font-weight: 400;
+      color: #77787d;
+    }
+    .classification-info {
+      margin-bottom: 24px;
+    }
+    hr {
+      margin-bottom: 20px;
+    }
+    .copyright-info {
+      font-size: 10px;
+      color: #77787d;
+    }
+    .img-logo {
+      height: 20px;
+      width: 20px;
+    }
+    .copyright-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .unit-input {
+      color: rgb(170, 170, 170);
+      font-size: 32px;
+      border: 0.5px solid rgb(172, 170, 170);
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      max-width: 150px;
+    }
+    #resultDiv {
+      margin-bottom: 50px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 30px;
+      line-height: 1.5;
+    }
+    .table-container {
+      margin-bottom: 40px;
+    }
+    .classification-detail {
+      font-size: 10px;
+      color: #abacad;
+    }
+    .table-headings {
+      font-weight: bold;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #0f1928;
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 4px;
+      width: 100%;
+      font-size: 12px;
+    }
+    .category-heading {
+      text-align: left;
+    }
+    tr th {
+      padding-bottom: 20px;
+    }
+    td {
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      color: #0f1928;
+    }
+  </style>
+  <body>
+    <div class="container-body">
+      <div class="buttons">
+        <button class="year-choice active" onclick="createAHA()" id="buttonAha">
+          2017 ACC/AHA
+        </button>
+        <button class="year-choice" id="buttonEsh" onclick="createESH()">
+          2018 ESC/ESH
+        </button>
+      </div>
+
+      <div class="reading-container">
+        <div class="readings reading1">
+          <div>
+            <p class="unit">SYS</p>
+            <span class="unit-value">mmHg</span>
+          </div>
+          <input
+            type="text"
+            id="sys-input"
+            onkeypress="return onlyNumberKey(event)"
+            class="unit-input"
+            maxlength="3"
+            inputmode="numeric"
+          />
+        </div>
+        <div class="readings">
+          <div>
+            <p class="unit">DIA</p>
+            <span class="unit-value">mmHg</span>
+          </div>
+          <input
+            type="text"
+            id="dia-input"
+            onkeypress="return onlyNumberKey(event)"
+            class="unit-input"
+            maxlength="3"
+            inputmode="numeric"
+          />
+        </div>
+      </div>
+      <div id="resultDiv"></div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="category-heading">Category</th>
+              <th>SYS(mmHg)</th>
+              <th></th>
+              <th>DIA(mmHg)</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable"></tbody>
+        </table>
+      </div>
+      <div class="classification-info">
+        <p class="classification-detail">
+          The classification mentioned is intended as a guide and not a mandate
+          'Therefore, discuss with your doctor before using the limits in the
+          toble The classification label description, limit values and colors in
+          the custom tab are modifiable.
+        </p>
+      </div>
+      <hr />
+      <div class="copyright-container">
+        <img
+          src="https://i.ibb.co/Z898TVf/smartbp-logo.png"
+          alt="logo"
+          class="img-logo"
+        />
+
+        <p class="copyright-info">
+          Powered by Evolve Medical Systems.LLC.All rights reserved.
+        </p>
+      </div>
+    </div>
+  </body>
+  <script>
+    const DATA_AHA = [
+      {
+        type: "Normal",
+        sysRange: {
+          min: 0,
+          max: 119,
+          displayString: "<120",
+        },
+        diaRange: {
+          min: 0,
+          max: 79,
+          displayString: "<80",
+        },
+        constraint: "and",
+        color: "#04cb83",
+      },
+      {
+        type: "Elevated BP",
+        sysRange: {
+          min: 120,
+          max: 129,
+          displayString: "",
+        },
+        diaRange: {
+          min: 0,
+          max: 79,
+          displayString: "<80",
+        },
+        constraint: "and",
+        color: "#a5cb39",
+      },
+      {
+        type: "Stage 1",
+        sysRange: {
+          min: 130,
+          max: 139,
+          displayString: "",
+        },
+        diaRange: {
+          min: 80,
+          max: 89,
+          displayString: "",
+        },
+        constraint: "or",
+        color: "#ffcf1c",
+      },
+      {
+        type: "Stage 2",
+        sysRange: {
+          min: 140,
+          max: 180,
+          displayString: ">=140",
+        },
+        diaRange: {
+          min: 90,
+          max: 120,
+          displayString: ">=90",
+        },
+        constraint: "or",
+        color: "#e07900",
+      },
+      {
+        type: "Hypertensive Crisis",
+        sysRange: {
+          min: 181,
+          max: 500,
+          displayString: ">180",
+        },
+        diaRange: {
+          min: 121,
+          max: 500,
+          displayString: ">120",
+        },
+        constraint: "and/or",
+        color: "#ae2c0f",
+      },
+    ];
+    const DATA_ESH = [
+      {
+        type: "Optimal",
+        sysRange: {
+          min: 0,
+          max: 119,
+          displayString: "<120",
+        },
+        diaRange: {
+          min: 0,
+          max: 79,
+          displayString: "<80",
+        },
+        constraint: "and",
+        color: "#04cb83",
+      },
+      {
+        type: "normal",
+        sysRange: {
+          min: 120,
+          max: 129,
+          displayString: "",
+        },
+        diaRange: {
+          min: 80,
+          max: 84,
+          displayString: "",
+        },
+        constraint: "and/or",
+        color: "#a6cb39",
+      },
+      {
+        type: "High Normal",
+        sysRange: {
+          min: 130,
+          max: 139,
+          displayString: "",
+        },
+        diaRange: {
+          min: 85,
+          max: 89,
+          displayString: "",
+        },
+        constraint: "and/or",
+        color: "#ffd329",
+      },
+      {
+        type: "Grade 1 Hypertension",
+        sysRange: {
+          min: 140,
+          max: 159,
+          displayString: "",
+        },
+        diaRange: {
+          min: 90,
+          max: 99,
+          displayString: "",
+        },
+        constraint: "and/or",
+        color: "#e07a00",
+      },
+      {
+        type: "Grade 2 Hypertension",
+        sysRange: {
+          min: 160,
+          max: 179,
+          displayString: "",
+        },
+        diaRange: {
+          min: 100,
+          max: 109,
+          displayString: "",
+        },
+        constraint: "and/or",
+        color: "#f5595a",
+      },
+      {
+        type: "Grade 3 Hypertension",
+        sysRange: {
+          min: 180,
+          max: 500,
+          displayString: ">=180",
+        },
+        diaRange: {
+          min: 110,
+          max: 500,
+          displayString: ">=110",
+        },
+        constraint: "and/or",
+        color: "#af2c10",
+      },
+    ];
+
+    const sysInput = document.getElementById("sys-input");
+    const diaInput = document.getElementById("dia-input");
+    const resultDiv = document.getElementById("resultDiv");
+
+    let data = DATA_AHA;
+    buttonAha.addEventListener("click", () => {
+      data = DATA_AHA;
+      resultDiv.innerHTML = "";
+      checkValues();
+    });
+    buttonEsh.addEventListener("click", () => {
+      data = DATA_ESH;
+      resultDiv.innerHTML = "";
+      checkValues();
+    });
+
+    function handleInput() {
+      checkValues();
+    }
+    diaInput.addEventListener("input", handleInput);
+    sysInput.addEventListener("input", handleInput);
+
+    function onlyNumberKey(evt) {
+      var ASCIICode = evt.which ? evt.which : evt.keyCode;
+      if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) return false;
+      return true;
+    }
+    function checkValues() {
+      const sysVal = parseFloat(sysInput.value);
+      const diaVal = parseFloat(diaInput.value);
+      if (sysInput.value === "" && diaInput.value === "") {
+        resultDiv.innerHTML = "";
+        return;
+      }
+
+      const filteredData = data.filter((x) => {
+        const sysCheck = sysVal >= x.sysRange.min && sysVal <= x.sysRange.max;
+        const diaCheck = diaVal >= x.diaRange.min && diaVal <= x.diaRange.max;
+        if (x.constraint === "and") {
+          return diaCheck && sysCheck;
+        } else if (x.constraint === "or") {
+          return diaCheck || sysCheck;
+        } else if (x.constraint === "and/or") {
+          return (
+            (!diaCheck && sysCheck) ||
+            (diaCheck && !sysCheck) ||
+            (diaCheck && sysCheck)
+          );
+        }
+      });
+      let category = "";
+      if (filteredData.length === 1) {
+        category = filteredData[0].type;
+      } else if (filteredData.length > 1) {
+        const sysItem = filteredData.find(
+          (x) => sysVal >= x.sysRange.min && sysVal <= x.sysRange.max
+        );
+        if (sysItem) {
+          category = sysItem.type;
+        } else {
+          category = "Please provide complete and accurate details";
+        }
+      } else {
+        category = "Please provide complete and accurate details";
+      }
+
+      switch (category) {
+        case "Normal":
+          resultDiv.style.color = "#04cb83";
+          break;
+        case "Elevated BP":
+          resultDiv.style.color = "#a5cb39";
+          break;
+        case "Stage 1":
+          resultDiv.style.color = "#ffcf1c";
+          break;
+        case "Stage 2":
+          resultDiv.style.color = "#e07900";
+          break;
+        case "Hypertensive Crisis":
+          resultDiv.style.color = "#ae2c0f";
+          break;
+        case "Optimal":
+          resultDiv.style.color = "#04cb83";
+          break;
+        case "normal":
+          resultDiv.style.color = "#a6cb39";
+          break;
+        case "High Normal":
+          resultDiv.style.color = "#ffd329";
+          break;
+        case "Grade 1 Hypertension":
+          resultDiv.style.color = "#e07a00";
+          break;
+        case "Grade 2 Hypertension":
+          resultDiv.style.color = "#f5595a";
+          break;
+        case "Grade 3 Hypertension":
+          resultDiv.style.color = "#af2c10";
+          break;
+        case "Please provide complete and accurate details":
+          resultDiv.style.color = "orangered";
+          break;
+      }
+      resultDiv.innerHTML =
+        category === "Please provide complete and accurate details"
+          ? "Please provide complete and accurate details"
+          : `You are in ${category} category`;
+    }
+
+    window.onload = function () {
+      createAHA();
+    };
+    let buttons = document.getElementsByClassName("year-choice");
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener("click", function () {
+        var current = document.getElementsByClassName("active");
+        current[0].classList.remove("active");
+        this.classList.add("active");
+      });
+    }
+
+    function createAHA() {
+      renderTable(DATA_AHA);
+    }
+
+    function createESH() {
+      renderTable(DATA_ESH);
+    }
+
+    function renderTable(data) {
+      const table = document.getElementById("dataTable");
+      table.innerHTML = "";
+      const dom = data.map((x) => {
+        const row = table.insertRow();
+        const cell1 = row.insertCell();
+        const cell2 = row.insertCell();
+        const cell3 = row.insertCell();
+        const cell4 = row.insertCell();
+        cell1.style.textAlign = "left";
+        cell1.style.padding = "0";
+        cell2.style.borderRadius = "10px 0 0 10px";
+        cell4.style.borderRadius = "0 10px 10px 0";
+        cell1.innerHTML = x.type;
+        if (x.sysRange.displayString) {
+          cell2.innerHTML = x.sysRange.displayString;
+        } else {
+          cell2.innerHTML = `${x.sysRange.min}-${x.sysRange.max}`;
+        }
+
+        cell3.innerHTML = x.constraint;
+        if (x.diaRange.displayString) {
+          cell4.innerHTML = x.diaRange.displayString;
+        } else {
+          cell4.innerHTML = `${x.diaRange.min}-${x.diaRange.max}`;
+        }
+
+        cell1.style.color = x.color;
+        cell2.style.backgroundColor = x.color;
+        cell3.style.backgroundColor = x.color;
+        cell4.style.backgroundColor = x.color;
+
+        if (row.rowIndex <= 2) {
+          cell2.style.color = "#0f1928";
+          cell3.style.color = "#0f1928";
+          cell4.style.color = "#0f1928";
+        } else {
+          cell2.style.color = "white";
+          cell3.style.color = "white";
+          cell4.style.color = "white";
+        }
+      });
+    }
+  </script>
+</html>
